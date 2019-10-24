@@ -89,14 +89,15 @@ export default {
   //   },
   // },
   computed: {
-    ...mapGetters(['cart', 'isLoading']),
+    ...mapGetters('cartsModules', ['cart', 'isLoading']),
+    ...mapGetters(['isLoading']),
   },
 
   methods: {
-    ...mapActions(['CART_GET']),
+    ...mapActions('cartsModules', ['CART_GET']),
 
     removeCart(id) {
-      this.$store.dispatch('CART_REMOVE', id);
+      this.$store.dispatch('cartsModules/CART_REMOVE', id);
     },
   },
   created() {

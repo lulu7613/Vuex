@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import axios from 'axios';
+
+import productsModules from './products';
+import cartsModules from './carts';
 
 Vue.use(Vuex);
 
@@ -17,11 +19,6 @@ export default new Vuex.Store({
   state: {
     // 定義資料狀態
     isLoading: false, // 各元件使用 this.$store.state.count 抓取資料 (不建議直接抓 state 資料)
-    products: [], // 取得非同步行為 AJAX
-    categories: [],
-    carts: {
-      carts: [],
-    },
   },
 
   actions: {
@@ -29,63 +26,6 @@ export default new Vuex.Store({
     //  context 第一个参数，payload(載荷) 第二个参数（可选）
     updateLoading(context, payload) {
       context.commit('LOADING', payload); // payload 為 LOADING 的 stats.isLoading 狀態
-    },
-
-    // 取得非同步行為 AJAX
-    getProducts(context) {
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products/all`;
-      context.commit('LOADING', true);
-      axios.get(url).then((response) => {
-        // vm.products = response.data.products; // 儲存資料的行為
-        context.commit('PRODUCTS', response.data.products);
-        console.log('取得產品列表:', response);
-        // vm.getUnique(); // 儲存資料的行為
-        context.commit('CATEGORY', response.data.products);
-        context.commit('LOADING', false);
-      });
-    },
-
-    // 取得 carts
-    CART_GET(context) {
-      context.commit('LOADING', true);
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-      axios.get(url).then((response) => {
-        if (response.data.data.carts) {
-          // vm.cart = response.data.data;
-          context.commit('CARTS', response.data.data);
-        }
-        context.commit('LOADING', false);
-        console.log('取得購物車', response.data.data);
-      });
-    },
-
-    // 加入 carts
-    CART_ADD(context, data) {
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-      context.commit('LOADING', true);
-      const item = {
-        product_id: data.id,
-        qty: data.qty,
-      };
-      context.commit('LOADING', true);
-      axios.post(url, { data: item }).then((response) => {
-        context.commit('LOADING', false);
-        context.dispatch('CART_GET');
-        // context.commit('CARTS_ADD', response.data.data);
-        console.log('加入購物車:', response);
-      });
-    },
-
-    // 移除 carts 的商品
-    CART_REMOVE(context, id) {
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart/${id}`;
-      context.commit('LOADING', true);
-      axios.delete(url).then((response) => {
-        context.commit('LOADING', false);
-        context.dispatch('CART_GET');
-        // context.commit('CARTS_REMOVE', id);
-        console.log('刪除購物車項目', response);
-      });
     },
 
     // 元件傳入行為到 Vuex 的方式:
@@ -101,35 +41,6 @@ export default new Vuex.Store({
       // payload 為 updateLoading 的 payload
       state.isLoading = payload;
     },
-
-    PRODUCTS(state, payload) {
-      state.products = payload;
-    },
-
-    CATEGORY(state, payload) {
-      console.log(payload);
-      const categories = new Set();
-      payload.forEach((item) => {
-        categories.add(item.category);
-      });
-      state.categories = Array.from(categories);
-    },
-
-    CARTS(state, payload) {
-      state.carts = payload;
-    },
-
-    // CARTS_ADD(state, data) {
-    //   state.carts.carts.push(data);
-    // },
-
-    // CARTS_REMOVE(state, itemId) {
-    //   state.carts.carts.filter((item, index) => {
-    //     if (item.id === itemId) {
-    //       return state.carts.carts.splice(index, 1);
-    //     } return null; // ESLint 嚴謹寫法
-    //   });
-    // },
   },
 
   getters: {
@@ -141,10 +52,11 @@ export default new Vuex.Store({
     // products(state) {
     //   return state.products;
     // },
-    products: state => state.products,
-    categories: state => state.categories,
-    cart: state => state.carts,
     isLoading: state => state.isLoading,
+  },
 
+  modules: {
+    productsModules,
+    cartsModules,
   },
 });

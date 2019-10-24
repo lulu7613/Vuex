@@ -94,13 +94,14 @@ export default {
     },
 
     // 用 ES6 展開的方式寫入
-    ...mapGetters(['products', 'categories']),
+    ...mapGetters('productsModules', ['products', 'categories']),
   },
   methods: {
-    ...mapActions(['getProducts']),
+    ...mapActions('productsModules', ['getProducts']),
 
     addtoCart(id, qty = 1) {
-      this.$store.dispatch('CART_ADD', { id, qty });
+      console.log(this.$store);
+      this.$store.dispatch('cartsModules/CART_ADD', { id, qty });
     },
     // getUnique() {
     //   const vm = this;
