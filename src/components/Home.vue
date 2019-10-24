@@ -69,6 +69,10 @@
 </template>
 
 <script>
+// 取得 vues 的 Getters，引入至 computed
+// 取得 vues 的 action，引入至 methods (只能引入沒有帶 payload 的 action)
+import { mapGetters, mapActions } from 'vuex';
+
 export default {
   name: 'Home',
   data() {
@@ -89,18 +93,12 @@ export default {
       return this.products;
     },
 
-    products() {
-      return this.$store.state.products;
-    },
-
-    categories() {
-      return this.$store.state.categories;
-    },
+    // 用 ES6 展開的方式寫入
+    ...mapGetters(['products', 'categories']),
   },
   methods: {
-    getProducts() {
-      this.$store.dispatch('getProducts');
-    },
+    ...mapActions(['getProducts']),
+
     addtoCart(id, qty = 1) {
       this.$store.dispatch('CART_ADD', { id, qty });
     },

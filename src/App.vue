@@ -69,6 +69,8 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
+
 export default {
   name: 'App',
   data() {
@@ -87,26 +89,18 @@ export default {
   //   },
   // },
   computed: {
-    isLoading() {
-      return this.$store.state.isLoading;
-    },
-
-    cart() {
-      return this.$store.state.carts;
-    },
+    ...mapGetters(['cart', 'isLoading']),
   },
 
   methods: {
-    getCart() {
-      this.$store.dispatch('CART_GET');
-    },
+    ...mapActions(['CART_GET']),
 
     removeCart(id) {
       this.$store.dispatch('CART_REMOVE', id);
     },
   },
   created() {
-    this.getCart();
+    this.CART_GET();
   },
 };
 </script>

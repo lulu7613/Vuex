@@ -19,7 +19,9 @@ export default new Vuex.Store({
     isLoading: false, // 各元件使用 this.$store.state.count 抓取資料 (不建議直接抓 state 資料)
     products: [], // 取得非同步行為 AJAX
     categories: [],
-    carts: [],
+    carts: {
+      carts: [],
+    },
   },
 
   actions: {
@@ -50,7 +52,7 @@ export default new Vuex.Store({
       axios.get(url).then((response) => {
         if (response.data.data.carts) {
           // vm.cart = response.data.data;
-          context.commit('CARTS_GET', response.data.data);
+          context.commit('CARTS', response.data.data);
         }
         context.commit('LOADING', false);
         console.log('取得購物車', response.data.data);
@@ -68,8 +70,8 @@ export default new Vuex.Store({
       context.commit('LOADING', true);
       axios.post(url, { data: item }).then((response) => {
         context.commit('LOADING', false);
-        context.commit('CARTS_ADD', response.data.data);
-        context.commit('CATEGORY', response.data.data);
+        context.dispatch('CART_GET');
+        // context.commit('CARTS_ADD', response.data.data);
         console.log('加入購物車:', response);
       });
     },
@@ -80,7 +82,8 @@ export default new Vuex.Store({
       context.commit('LOADING', true);
       axios.delete(url).then((response) => {
         context.commit('LOADING', false);
-        context.commit('CARTS_REMOVE', id);
+        context.dispatch('CART_GET');
+        // context.commit('CARTS_REMOVE', id);
         console.log('刪除購物車項目', response);
       });
     },
@@ -112,20 +115,36 @@ export default new Vuex.Store({
       state.categories = Array.from(categories);
     },
 
-    CARTS_GET(state, payload) {
+    CARTS(state, payload) {
       state.carts = payload;
     },
 
-    CARTS_ADD(state, data) {
-      state.carts.carts.push(data);
-    },
+    // CARTS_ADD(state, data) {
+    //   state.carts.carts.push(data);
+    // },
 
-    CARTS_REMOVE(state, itemId) {
-      state.carts.carts.filter((item, index) => {
-        if (item.id === itemId) {
-          return state.carts.carts.splice(index, 1);
-        } return null; // ESLint 嚴謹寫法
-      });
-    },
+    // CARTS_REMOVE(state, itemId) {
+    //   state.carts.carts.filter((item, index) => {
+    //     if (item.id === itemId) {
+    //       return state.carts.carts.splice(index, 1);
+    //     } return null; // ESLint 嚴謹寫法
+    //   });
+    // },
+  },
+
+  getters: {
+    // 可以儲存 Component 的 computed
+    // 在 component 使用 import { mapGetters } from 'vuex  (只取得 vuex 中的  mapGetters，是解構的概念)
+    // 可當作 computed 使用
+    // 可使用箭頭函式
+
+    // products(state) {
+    //   return state.products;
+    // },
+    products: state => state.products,
+    categories: state => state.categories,
+    cart: state => state.carts,
+    isLoading: state => state.isLoading,
+
   },
 });
