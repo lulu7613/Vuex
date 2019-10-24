@@ -9,7 +9,7 @@
       <div class="dropdown ml-auto">
         <button class="btn btn-sm btn-cart" data-toggle="dropdown" data-flip="false">
           <i class="fa fa-shopping-cart text-dark fa-2x" aria-hidden="true"></i>
-          <span class="badge badge-pill badge-danger">{{cart.carts.length}}</span>
+          <span class="badge badge-pill badge-danger" v-if="cart.carts">{{cart.carts.length}}</span>
           <span class="sr-only">unread messages</span>
         </button>
         <div class="dropdown-menu dropdown-menu-right p-3" style="min-width: 300px"
@@ -17,7 +17,7 @@
           <h6>已選擇商品</h6>
           <table class="table table-sm">
             <tbody>
-              <tr v-for="item in cart.carts" :key="item.id" v-if="cart.carts.length">
+              <tr v-for="item in cart.carts" :key="item.id" v-if="cart.carts">
                 <td class="align-middle text-center">
                   <a href="#" class="text-muted" @click.prevent="removeCart(item.id)">
                     <i class="fa fa-trash-o" aria-hidden="true"></i>
@@ -73,9 +73,9 @@ export default {
   name: 'App',
   data() {
     return {
-      cart: {
-        carts: [],
-      },
+      // cart: {
+      //   carts: [],
+      // },
       // isLoading: false,
     };
   },
@@ -90,30 +90,19 @@ export default {
     isLoading() {
       return this.$store.state.isLoading;
     },
+
+    cart() {
+      return this.$store.state.carts;
+    },
   },
 
   methods: {
     getCart() {
-      const vm = this;
-      vm.$store.dispatch('updateLoading', true);
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
-      this.$http.get(url).then((response) => {
-        if (response.data.data.carts) {
-          vm.cart = response.data.data;
-        }
-        vm.$store.dispatch('updateLoading', false);
-        console.log('取得購物車', response.data.data);
-      });
+      this.$store.dispatch('CART_GET');
     },
+
     removeCart(id) {
-      const vm = this;
-      const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart/${id}`;
-      vm.$store.dispatch('updateLoading', true);
-      this.$http.delete(url).then((response) => {
-        vm.$store.dispatch('updateLoading', false);
-        vm.getCart();
-        console.log('刪除購物車項目', response);
-      });
+      this.$store.dispatch('CART_REMOVE', id);
     },
   },
   created() {
